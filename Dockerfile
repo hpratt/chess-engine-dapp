@@ -24,7 +24,7 @@ RUN apt -y update && apt -y install wget python3 python3-pip git cmake && \
     git clone https://github.com/Matthies/RubiChess && cd RubiChess/src && make && mv RubiChess /bin && \
     wget "https://github.com/Matthies/NN/raw/main/nn-fb50f1a2b1-20210705.nnue" -O /nn-fb50f1a2b1-20210705.nnue && \
     cd ../.. && rm -rf RubiChess && \
-    apt -y remove wget make build-essential python3-pip && \
+    apt -y remove wget make build-essential python3-pip git cmake && \
     rm -rf /var/lib/apt/lists/*
 
 ADD src/app.py /usr/local/bin/app.py
