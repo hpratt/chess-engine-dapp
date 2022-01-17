@@ -39,7 +39,7 @@ def args():
     parser.add_argument("--depth", type = int, default = None, help = "optional; depth to search")
     parser.add_argument("--time-limit", type = float, default = None, help = "optional; time limit for analysis execution in seconds; default 15")
     parser.add_argument("--pv-count", type = int, default = 3, help = "optional; number of principal variations to report; default 3")
-    parser.add_argument("--output-directory", type = str, required = True, help = "optional; path to output directory where results.json will be written; otherwise stdout will receive output")
+    parser.add_argument("--output-directory", type = str, default = "", help = "optional; path to output directory where results.json will be written; otherwise IEXEC_OUT environment variable will be used")
     parser.add_argument("--engine", type = Engine, choices = list(Engine), nargs = '+', help = "optional; engine(s) to use for evaluation", default = None)
     return parser.parse_args()
 
@@ -82,11 +82,11 @@ def main():
     result = json.dumps({ x.value: run(cargs, binary_map[x.value]) for x in cargs.engine })
 
     ### write result to requested output
-    if cargs.output_directory is None:
-        print(result)
-    else:
-        with open(os.path.join(cargs.output_directory, "results.json"), 'wt') as o:
-            o.write(result + '\n')
+    if cargs.output_directory is None: cargs.output_directory = os.environ["IEXEC_OUT"]
+    with open(os.path.join(cargs.output_directory, "results.json"), 'wt') as o:
+        o.write(result + '\n')
+    with open(os.path.join(cargs.output_directory, "computed.json"), 'wt') as o:
+        o.write(json.dumps({ "deterministic-output-path": os.path.join(cargs.output_directory, "computed.json") }) + '\n')
 
 def run(cargs, engineB):
 

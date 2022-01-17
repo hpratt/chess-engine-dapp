@@ -27,6 +27,7 @@ class TestApp(unittest.TestCase):
             mounts = RESOURCE_MOUNTS + [( d, OUTPUTS )]
             output = os.path.join(d, "results.json")
             self.assertEqual(exe(mounts, "--json-input", "/inputs/fools-mate.json", "--output-directory", "/outputs"), 0)
+            self.assertEqual(os.path.exists(os.path.join(d, "computed.json")), True)
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
