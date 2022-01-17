@@ -16,9 +16,9 @@ def exe(mounts, *args):
     mountsv = []
     for x in mounts:
         mountsv += [ "--volume", x[0] + ':' + x[1] ]
-    return subprocess.call([ "docker", "run" ] + mountsv + [ IMAGE_NAME ] + list(args))
+    return subprocess.call([ "docker", "run" ] + mountsv + [ IMAGE_NAME, "evaluate" ] + list(args))
 
-class TestApp(unittest.TestCase):
+class TestEvaluation(unittest.TestCase):
 
     def test_fools_mate_depth_18(self):
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "fools-mate-output.json"), 'rt') as f:

@@ -1,0 +1,1 @@
+{"white": {"engine": "Stockfish", "depth": "default"}, "black": {"engine": "Stockfish", "depth": "default"}, "opening_moves": "f3 e6 g4", "engine_moves": "Qh4#"}
