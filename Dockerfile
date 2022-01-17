@@ -22,7 +22,7 @@ RUN apt -y update && apt -y install wget python3 python3-pip git cmake && \
     cmake -DEVALFILE=network_file -DEVAL_NNUE=1 -DUSE_PEXT=1 -DUSE_AVX2=1 -D_BTYPE=1 -DSYZYGY_SUPPORT=TRUE . && \
     make && mv igel /bin && cd .. && rm -rf igel && \
     git clone https://github.com/Matthies/RubiChess && cd RubiChess/src && make && mv RubiChess /bin && \
-    wget "https://github.com/Matthies/NN/raw/main/nn-fb50f1a2b1-20210705.nnue" -O /nn-fb50f1a2b1-20210705.nnue && \
+    wget "https://github.com/Matthies/NN/raw/main/nn-26119c6435-20220109.nnue" -O /nn-26119c6435-20220109.nnue && \
     cd ../.. && rm -rf RubiChess && \
     apt -y remove wget make build-essential python3-pip git cmake && \
     rm -rf /var/lib/apt/lists/*

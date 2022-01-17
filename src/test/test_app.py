@@ -30,7 +30,7 @@ class TestApp(unittest.TestCase):
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
-                self.assertEqual(j, { "Stockfish": expected_output })
+                self.assertEqual(j, expected_output)
 
     def test_fools_mate_san(self):
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "fools-mate-san-output.json"), 'rt') as f:
@@ -42,7 +42,7 @@ class TestApp(unittest.TestCase):
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
-                self.assertEqual(j, { "Stockfish": expected_output })
+                self.assertEqual(j, expected_output)
 
     def test_fools_mate_san_string(self):
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "fools-mate-san-output.json"), 'rt') as f:
@@ -54,7 +54,7 @@ class TestApp(unittest.TestCase):
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
-                self.assertEqual(j, { "Stockfish": expected_output })
+                self.assertEqual(j, expected_output)
 
     def test_fools_mate_depth_18_uci(self):
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "fools-mate-output.json"), 'rt') as f:
@@ -66,7 +66,7 @@ class TestApp(unittest.TestCase):
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
-                self.assertEqual(j, { "Stockfish": expected_output })
+                self.assertEqual(j, expected_output)
 
     def test_fools_mate_depth_15(self):
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "fools-mate-output-15.json"), 'rt') as f:
@@ -78,7 +78,7 @@ class TestApp(unittest.TestCase):
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
-                self.assertEqual(j, { "Stockfish": expected_output })
+                self.assertEqual(j, expected_output)
 
     def test_fools_mate_pv_6(self):
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "fools-mate-output-pv6.json"), 'rt') as f:
@@ -90,7 +90,7 @@ class TestApp(unittest.TestCase):
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
-                self.assertEqual(j, { "Stockfish": expected_output })
+                self.assertEqual(j, expected_output)
 
     def test_game_of_century(self):
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "game-of-century-output.json"), 'rt') as f:
@@ -102,7 +102,7 @@ class TestApp(unittest.TestCase):
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
-                self.assertEqual(j, { "Stockfish": expected_output })
+                self.assertEqual(j, expected_output)
 
     def test_game_of_century_multi_engine(self):
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", "game-of-century-output.multi-engine.json"), 'rt') as f:
