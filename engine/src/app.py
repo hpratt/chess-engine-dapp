@@ -106,7 +106,7 @@ def evaluate(cargs):
     with open(os.path.join(cargs.output_directory, "results.json"), 'wt') as o:
         o.write(result + '\n')
     with open(os.path.join(cargs.output_directory, "computed.json"), 'wt') as o:
-        o.write(json.dumps({ "deterministic-output-path": os.path.join(cargs.output_directory, "computed.json") }) + '\n')
+        o.write(json.dumps({ "deterministic-output-path": os.path.join(cargs.output_directory, "results.json") }) + '\n')
 
 def run(cargs, engineB):
 
@@ -176,7 +176,7 @@ def engine_game(cargs):
     with open(os.path.join(cargs.output_directory, "results.json"), 'wt') as o:
         o.write(json.dumps(result) + '\n')
     with open(os.path.join(cargs.output_directory, "computed.json"), 'wt') as o:
-        o.write(json.dumps({ "deterministic-output-path": os.path.join(cargs.output_directory, "computed.json") }) + '\n')
+        o.write(json.dumps({ "deterministic-output-path": os.path.join(cargs.output_directory, "results.json") }) + '\n')
 
 if __name__ == "__main__":
     sys.exit(main())
