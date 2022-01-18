@@ -102,7 +102,7 @@ def evaluate(cargs):
     result = json.dumps({ x.value: run(cargs, binary_map[x.value]) for x in cargs.engine })
 
     ### write result to requested output
-    if cargs.output_directory is None: cargs.output_directory = os.environ["IEXEC_OUT"]
+    if cargs.output_directory == "": cargs.output_directory = os.environ["IEXEC_OUT"]
     with open(os.path.join(cargs.output_directory, "results.json"), 'wt') as o:
         o.write(result + '\n')
     with open(os.path.join(cargs.output_directory, "computed.json"), 'wt') as o:
@@ -172,7 +172,7 @@ def engine_game(cargs):
         "engine_moves": " ".join(moves)
     }
     if cargs.opening_fen is not None: result["starting_position"] = cargs.opening_fen
-    if cargs.output_directory is None: cargs.output_directory = os.environ["IEXEC_OUT"]
+    if cargs.output_directory == "": cargs.output_directory = os.environ["IEXEC_OUT"]
     with open(os.path.join(cargs.output_directory, "results.json"), 'wt') as o:
         o.write(json.dumps(result) + '\n')
     with open(os.path.join(cargs.output_directory, "computed.json"), 'wt') as o:
