@@ -127,8 +127,9 @@ def run(cargs, engineB):
     ### format results
     return [{
         "depth": x["depth"],
-        "pv": [ xx.uci() for xx in x["pv"] ] if not cargs.move_output_san else board.variation_san(x["pv"]),
-        "score": format_score(x["score"].white())
+        "pv": " ".join([ xx.uci() for xx in x["pv"] ]) if not cargs.move_output_san else board.variation_san(x["pv"]),
+        "score": format_score(x["score"].white()),
+        "position": " ".join(cargs.start_position)
     } for x in analysis ]
 
     return 0
