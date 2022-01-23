@@ -99,7 +99,9 @@ def evaluate(cargs):
 
     ### loop through the requested engines
     if cargs.engine is None: cargs.engine = [ Engine.stockfish ]
-    result = json.dumps({ x.value: run(cargs, binary_map[x.value]) for x in cargs.engine })
+    result = { x.value: run(cargs, binary_map[x.value]) for x in cargs.engine }
+    if cargs.start_position is not None: result["position"] = " ".join(cargs.start_position)
+    result = json.dumps(result)
 
     ### write result to requested output
     if cargs.output_directory == "": cargs.output_directory = os.environ["IEXEC_OUT"]
@@ -128,8 +130,7 @@ def run(cargs, engineB):
     return [{
         "depth": x["depth"],
         "pv": " ".join([ xx.uci() for xx in x["pv"] ]) if not cargs.move_output_san else board.variation_san(x["pv"]),
-        "score": format_score(x["score"].white()),
-        "position": " ".join(cargs.start_position)
+        "score": format_score(x["score"].white())
     } for x in analysis ]
 
     return 0
