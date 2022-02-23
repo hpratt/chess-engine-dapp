@@ -6,13 +6,19 @@ import argparse
 import chess
 import chess.engine
 import json
+import tempfile
+
 from enum import Enum
+from keras.models import load_model
+from sunnfish.sunfish import piece_map
 
 class Engine(Enum):
     
     stockfish = 'Stockfish'
     rubichess = 'RubiChess'
     igel = 'Igel'
+    foghorn = 'Foghorn'
+    lighthouse = 'Lighthouse'
 
     def __str__(self):
         return self.value
@@ -20,14 +26,27 @@ class Engine(Enum):
 binary_map = {
     'Stockfish': '/usr/local/bin/stockfish',
     'RubiChess': '/bin/RubiChess',
-    'Igel': '/bin/igel'
+    'Igel': '/bin/igel',
+    'Lighthouse': [ '/usr/bin/python3', '/sunnfish/uci.py' ],
+    'Foghorn': [ '/usr/bin/python3', '/sunnfish/uci.py' ]
 }
 
 engine_map = {
     'Stockfish': Engine.stockfish,
     'RubiChess': Engine.rubichess,
-    'Igel': Engine.igel
+    'Igel': Engine.igel,
+    'Foghorn': Engine.foghorn,
+    'Lighthouse': Engine.lighthouse
 }
+
+def fen_to_input(fen):
+    r = []
+    p = fen.split()
+    for x in p[0].replace('/', ""):
+        if x.isnumeric():
+            for i in range(int(x)): r += piece_map['.']
+        else: r += piece_map[x]
+    return r + ([ 1, 0 ] if p[1] == 'b' else [ 0, 1 ])
 
 def args():
 
@@ -77,10 +96,22 @@ def format_san(moves, board):
     return results
 
 def main():
+    nn_model = os.path.join(
+        os.environ['IEXEC_IN'] if 'IEXEC_IN' in os.environ else "",
+        os.environ['IEXEC_DATASET_FILENAME'] if "IEXEC_DATASET_FILENAME" in os.environ else ""
+    )
+    model_directory = tempfile.TemporaryDirectory()
+    os.system("tar xfvz %s -C %s" % (nn_model, model_directory.name))
+    env_map = {
+        "Foghorn": { "NN_MODEL": os.path.join(model_directory.name, "foghorn.h5") },
+        "Lighthouse": { "NN_CONV": "t", "NN_MODEL": os.path.join(model_directory.name, "lighthouse.h5") }
+    }
     cargs = args()
-    cargs.func(cargs)
+    cargs.func(cargs, env_map)
+    model_directory.cleanup()
+    return 0
 
-def evaluate(cargs):
+def evaluate(cargs, env_map):
 
     ### read JSON input if provided; JSON parameters override any command line parameters.
     if cargs.json_input is not None:
@@ -99,7 +130,17 @@ def evaluate(cargs):
 
     ### loop through the requested engines
     if cargs.engine is None: cargs.engine = [ Engine.stockfish ]
-    result = { x.value: run(cargs, binary_map[x.value]) for x in cargs.engine }
+    result = {}
+    for x in cargs.engine:
+        r, b = run(cargs, binary_map[x.value], env_map[x.value] if x.value in env_map else {})
+        result[x.value] = r
+        if x == Engine.foghorn:
+            model = load_model(env_map[x.value]["NN_MODEL"])
+            result[x.value][0]["nn_output"] = model.predict([ fen_to_input(b.fen()) ]).tolist()
+        elif x == Engine.lighthouse:
+            model = load_model(env_map[x.value]["NN_MODEL"])
+            i = fen_to_input(b.fen())
+            result[x.value][0]["nn_output"] = model.predict([ i, i[:768], i[768:] ]).tolist()
     if cargs.start_position is not None: result["position"] = " ".join(cargs.start_position)
     result = json.dumps(result)
 
@@ -110,32 +151,32 @@ def evaluate(cargs):
     with open(os.path.join(cargs.output_directory, "computed.json"), 'wt') as o:
         o.write(json.dumps({ "deterministic-output-path": os.path.join(cargs.output_directory, "results.json") }) + '\n')
 
-def run(cargs, engineB):
+def run(cargs, engineB, env = {}):
 
     ### initialize the board within the engine
     board = chess.Board() if cargs.start_position is None or len(cargs.start_position) == 0 else chess.Board(" ".join(cargs.start_position))
     
     ### make any user-specified moves and analyze the resulting position
-    with chess.engine.SimpleEngine.popen_uci(engineB) as engine:
+    with chess.engine.SimpleEngine.popen_uci(engineB, env = env) as engine:
         if cargs.uci_moves is not None:
             for move in cargs.uci_moves:
                 board.push_uci(move)
         elif cargs.san_moves is not None:
             for move in cargs.san_moves:
                 board.push_san(move)
-        analysis = engine.analyse(board, chess.engine.Limit(time = cargs.time_limit, depth = cargs.depth), multipv = None if "RubiChess" in engineB or "igel" in engineB else cargs.pv_count)
-    if "RubiChess" in engineB or "igel" in engineB: analysis = [ analysis ]
+        analysis = engine.analyse(board, chess.engine.Limit(time = cargs.time_limit, depth = cargs.depth), multipv = None if "RubiChess" in engineB or "igel" in engineB or "/sunnfish/uci.py" in engineB else cargs.pv_count)
+    if "RubiChess" in engineB or "igel" in engineB or "/sunnfish/uci.py" in engineB: analysis = [ analysis ]
 
     ### format results
-    return [{
+    a = [{
         "depth": x["depth"],
         "pv": " ".join([ xx.uci() for xx in x["pv"] ]) if not cargs.move_output_san else board.variation_san(x["pv"]),
         "score": format_score(x["score"].white())
     } for x in analysis ]
+    for move in analysis[0]["pv"]: board.push(move)
+    return a, board
 
-    return 0
-
-def engine_game(cargs):
+def engine_game(cargs, env_map):
 
     # initialize the board and make any user-specified opening moves
     board = chess.Board() if cargs.opening_fen is None or len(cargs.opening_fen) == 0 else chess.Board(" ".join(cargs.opening_fen))
@@ -148,8 +189,8 @@ def engine_game(cargs):
 
     # play the game
     moves = []
-    with chess.engine.SimpleEngine.popen_uci(binary_map[cargs.white_engine.value]) as white:
-        with chess.engine.SimpleEngine.popen_uci(binary_map[cargs.black_engine.value]) as black:
+    with chess.engine.SimpleEngine.popen_uci(binary_map[cargs.white_engine.value], env = env_map[cargs.white_engine.value] if cargs.white_engine.value in env_map else {}) as white:
+        with chess.engine.SimpleEngine.popen_uci(binary_map[cargs.black_engine.value], env = env_map[cargs.black_engine.value] if cargs.black_engine.value in env_map else {}) as black:
             while not board.is_game_over() and len(moves) < cargs.ply_limit:
                 if board.turn == chess.WHITE:
                     move = white.play(board, chess.engine.Limit(time = cargs.white_engine_time_limit, depth = cargs.white_engine_depth)).move

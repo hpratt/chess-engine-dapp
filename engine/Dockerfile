@@ -12,7 +12,7 @@ RUN apt -y update && apt -y install wget python3 python3-pip git cmake && \
     if [ ! -d Stockfish-${VERSION} ]; then tar xvzf *.tar.gz; fi && \
     cd Stockfish-${VERSION}/src && \
     apt -y install make build-essential && \
-    python3 -m pip install python-chess && \
+    python3 -m pip install python-chess tensorflow keras && \
     make build ARCH=x86-64-modern && \
     make install && \
     cd ../.. && rm -rf Stockfish-${VERSION} *.tar.gz && \
@@ -22,11 +22,13 @@ RUN apt -y update && apt -y install wget python3 python3-pip git cmake && \
     cmake -DEVALFILE=network_file -DEVAL_NNUE=1 -DUSE_PEXT=1 -DUSE_AVX2=1 -D_BTYPE=1 -DSYZYGY_SUPPORT=TRUE . && \
     make && mv igel /bin && cd .. && rm -rf igel && \
     git clone https://github.com/Matthies/RubiChess && cd RubiChess/src && make && mv RubiChess /bin && \
-    wget "https://github.com/Matthies/NN/raw/main/nn-26119c6435-20220109.nnue" -O /nn-26119c6435-20220109.nnue && \
+    wget "https://github.com/Matthies/NN/raw/main/nn-d585174582-20220214.nnue" -O /nn-d585174582-20220214.nnue && \
     cd ../.. && rm -rf RubiChess && \
     apt -y remove wget make build-essential python3-pip git cmake && \
     rm -rf /var/lib/apt/lists/*
 
 ADD src/app.py /usr/local/bin/app.py
+COPY sunnfish /sunnfish
+RUN rm /sunnfish/light-test-models.tar.gz && ln -s /sunnfish /usr/local/lib/python3.8/dist-packages
 WORKDIR /
 ENTRYPOINT [ "/usr/local/bin/app.py" ]

@@ -1,0 +1,1 @@
+{"white": {"engine": "Stockfish", "depth": 19}, "black": {"engine": "Foghorn", "depth": 25}, "opening_moves": "d4 e5 dxe5", "engine_moves": "Nc6 Nf3 d5 Bf4 Bf5 e3 Rc8 Bd3 Bxd3 Qxd3 Bc5 Nc3 Nb8 Nxd5 Ne7 Rd1 Bb6 Qb5+ Nd7"}
