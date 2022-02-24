@@ -2,3 +2,5 @@ chain.json
 deployed.json
 iexec.json
 orders.json
+.secrets/
+datasets/original/
