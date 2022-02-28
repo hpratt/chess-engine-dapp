@@ -136,10 +136,10 @@ def evaluate(cargs, env_map):
         result[x.value] = r
         if x == Engine.foghorn:
             model = load_model(env_map[x.value]["NN_MODEL"])
-            result[x.value][0]["nn_output"] = model.predict([ fen_to_input(b.fen()) ]).tolist()
+            result[x.value][0]["nn_output"] = model.predict([ numpy.array(fen_to_input(b.fen())) ]).tolist()
         elif x == Engine.lighthouse:
             model = load_model(env_map[x.value]["NN_MODEL"])
-            i = fen_to_input(b.fen())
+            i = numpy.array(fen_to_input(b.fen()))
             result[x.value][0]["nn_output"] = model.predict([ i, i[:768], i[768:] ]).tolist()
     if cargs.start_position is not None: result["position"] = " ".join(cargs.start_position)
     result = json.dumps(result)

@@ -15,9 +15,11 @@ MODEL_MOUNTS = [ (os.path.join(os.path.dirname(os.path.realpath(__file__)), "sun
 
 def exe(mounts, *args):
     mountsv = []
-    for x in mounts:
+    for x in mounts + MODEL_MOUNTS:
         mountsv += [ "--volume", x[0] + ':' + x[1] ]
     env = [ "--env", "IEXEC_IN=/model", "--env", "IEXEC_DATASET_FILENAME=light-test-models.tar.gz" ]
+    import sys
+    print(" ".join([ "docker", "run" ] + env + mountsv + [ IMAGE_NAME, "evaluate" ] + list(args)), file = sys.stderr)
     return subprocess.call([ "docker", "run" ] + env + mountsv + [ IMAGE_NAME, "engine-game" ] + list(args))
 
 class TestEvaluation(unittest.TestCase):

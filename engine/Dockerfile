@@ -1,34 +1,37 @@
-FROM ubuntu:latest
+FROM ghcr.io/hpratt/tensorflow-alpine/tensorflow-alpine:t1.7.0-0.0.5
 
 ENV SOURCE_REPO https://github.com/official-stockfish/Stockfish
 ENV VERSION master
-ENV CXXFLAGS -std=c++17
+ENV CXXFLAGS -std=c++17 -DUSE_IPO=off -U_FORTIFY_SOURCE
 ENV DEBIAN_FRONTEND noninteractive
 
 ADD ${SOURCE_REPO}/archive/${VERSION}.tar.gz /root
 WORKDIR /root
 
-RUN apt -y update && apt -y install wget python3 python3-pip git cmake && \
-    if [ ! -d Stockfish-${VERSION} ]; then tar xvzf *.tar.gz; fi && \
+RUN apk add --no-cache wget python3 py3-pip build-base git cmake python3-dev
+
+RUN if [ ! -d Stockfish-${VERSION} ]; then tar xvzf *.tar.gz; fi && \
     cd Stockfish-${VERSION}/src && \
-    apt -y install make build-essential && \
-    python3 -m pip install python-chess tensorflow keras && \
+    python3 -m pip install python-chess && \
+    export CFLAGS="$CFLAGS -march=znver3 -mtune=znver3" && \
+    export CXXFLAGS="$CXXFLAGS -march=znver3 -mtune=znver3" && \
     make build ARCH=x86-64-modern && \
     make install && \
-    cd ../.. && rm -rf Stockfish-${VERSION} *.tar.gz && \
-    git clone https://github.com/vshcherbyna/igel.git ./igel && cd igel && \
+    cd ../.. && rm -rf Stockfish-${VERSION} *.tar.gz
+RUN git clone https://github.com/vshcherbyna/igel.git ./igel && cd igel && \
     git submodule update --init --recursive && \
     wget https://github.com/vshcherbyna/igel/releases/download/3.0.5/ign-1-d593efbd -O ./network_file && \
     cmake -DEVALFILE=network_file -DEVAL_NNUE=1 -DUSE_PEXT=1 -DUSE_AVX2=1 -D_BTYPE=1 -DSYZYGY_SUPPORT=TRUE . && \
     make && mv igel /bin && cd .. && rm -rf igel && \
     git clone https://github.com/Matthies/RubiChess && cd RubiChess/src && make && mv RubiChess /bin && \
-    wget "https://github.com/Matthies/NN/raw/main/nn-d585174582-20220214.nnue" -O /nn-d585174582-20220214.nnue && \
+    wget "https://github.com/Matthies/NN/raw/main/nn-d458c5999d-20220222.nnue" -O /nn-d458c5999d-20220222.nnue && \
     cd ../.. && rm -rf RubiChess && \
-    apt -y remove wget make build-essential python3-pip git cmake && \
-    rm -rf /var/lib/apt/lists/*
+    apk del --purge wget make build-base py3-pip git cmake
 
-ADD src/app.py /usr/local/bin/app.py
-COPY sunnfish /sunnfish
-RUN rm /sunnfish/light-test-models.tar.gz && ln -s /sunnfish /usr/local/lib/python3.8/dist-packages
+ADD src/app.py /app/app.py
+COPY sunnfish /usr/lib/python3.9/site-packages
+RUN ln -s /app/app.py /usr/local/bin/app.py
+# RUN apk add hdf5-dev py3-pip && python3 -m pip install 'h5py==2.10.0' --ignore-installed six
+RUN find /usr/lib/python3.9/site-packages/keras/ -name "*py" -type f -exec sed -i -e "s/[\.]decode[\(][\']utf8[\'][\)]//g" {} \;
 WORKDIR /
-ENTRYPOINT [ "/usr/local/bin/app.py" ]
+ENTRYPOINT [ "app.py" ]
