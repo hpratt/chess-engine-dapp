@@ -29,7 +29,8 @@ RUN git clone https://github.com/vshcherbyna/igel.git ./igel && cd igel && \
     apk del --purge wget make build-base py3-pip git cmake
 
 ADD src/app.py /app/app.py
-COPY sunnfish /usr/lib/python3.9/site-packages
+ADD sunnfish/ /usr/lib/python3.9/site-packages/sunnfish
+RUN ln -s /usr/lib/python3.9/site-packages/sunnfish /sunnfish
 RUN ln -s /app/app.py /usr/local/bin/app.py
 # RUN apk add hdf5-dev py3-pip && python3 -m pip install 'h5py==2.10.0' --ignore-installed six
 RUN find /usr/lib/python3.9/site-packages/keras/ -name "*py" -type f -exec sed -i -e "s/[\.]decode[\(][\']utf8[\'][\)]//g" {} \;

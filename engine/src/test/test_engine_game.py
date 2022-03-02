@@ -60,19 +60,6 @@ class TestEvaluation(unittest.TestCase):
             output = os.path.join(d, "results.json")
             self.assertEqual(exe(mounts, "--white-engine-depth", "15", "--black-engine-depth", "15", "--ply-limit", "50", "--opening-san", "Nf3", "Nf6", "c4", "g6", "Nc3", "Bg7", "d4", "0-0", "Bf4", "d5", "Qb3", "dxc4", "Qxc4", "c6", "e4", "Nbd7", "Rd1", "Nb6", "Qc5", "Bg4", "Bg5", "--white-engine", "Stockfish", "--black-engine", "Stockfish", "--output-directory", OUTPUTS), 0)
             self.assertEqual(os.path.exists(output), True)
-            os.system("cp %s %s" % (output, TestEvaluation.resourcePath("game-of-century-50-ply.json")))
-            with open(output, 'rt') as f:
-                j = json.load(f)
-                self.assertEqual(j, expected_output)
-
-    def test_englund_gambit_timed(self):
-        with open(TestEvaluation.resourcePath("englund-gambit-timed.json"), 'rt') as f:
-            expected_output = json.load(f)
-        with tempfile.TemporaryDirectory() as d:
-            mounts = RESOURCE_MOUNTS + [( d, OUTPUTS )]
-            output = os.path.join(d, "results.json")
-            self.assertEqual(exe(mounts, "--white-engine-time-limit", "5", "--black-engine-time-limit", "5", "--white-engine-depth", "15", "--black-engine-depth", "15", "--ply-limit", "50", "--opening-san", "d4", "e5", "dxe5", "--white-engine", "Stockfish", "--black-engine", "RubiChess", "--output-directory", OUTPUTS), 0)
-            self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
                 self.assertEqual(j, expected_output)

@@ -7,6 +7,7 @@ import chess
 import chess.engine
 import json
 import tempfile
+import numpy
 
 from enum import Enum
 from keras.models import load_model
@@ -44,7 +45,7 @@ def fen_to_input(fen):
     p = fen.split()
     for x in p[0].replace('/', ""):
         if x.isnumeric():
-            for i in range(int(x)): r += piece_map['.']
+            for _ in range(int(x)): r += piece_map['.']
         else: r += piece_map[x]
     return r + ([ 1, 0 ] if p[1] == 'b' else [ 0, 1 ])
 
@@ -136,11 +137,11 @@ def evaluate(cargs, env_map):
         result[x.value] = r
         if x == Engine.foghorn:
             model = load_model(env_map[x.value]["NN_MODEL"])
-            result[x.value][0]["nn_output"] = model.predict([ numpy.array(fen_to_input(b.fen())) ]).tolist()
+            result[x.value][0]["nn_output"] = model.predict([ numpy.array([ fen_to_input(b.fen()) ]) ]).tolist()
         elif x == Engine.lighthouse:
             model = load_model(env_map[x.value]["NN_MODEL"])
-            i = numpy.array(fen_to_input(b.fen()))
-            result[x.value][0]["nn_output"] = model.predict([ i, i[:768], i[768:] ]).tolist()
+            i = fen_to_input(b.fen())
+            result[x.value][0]["nn_output"] = model.predict([ numpy.array([ i ]), numpy.array([ i[:768] ]), numpy.array([ i[768:] ]) ]).tolist()
     if cargs.start_position is not None: result["position"] = " ".join(cargs.start_position)
     result = json.dumps(result)
 

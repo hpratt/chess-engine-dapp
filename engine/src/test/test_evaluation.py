@@ -131,6 +131,7 @@ class TestEvaluation(unittest.TestCase):
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
-                self.assertIn("Foghorn", j)
-                self.assertEqual(len(j["Foghorn"]), 1)
-                self.assertIn("nn_output", j["Foghorn"][0])
+                for _ in [ "Foghorn", "Lighthouse" ]:
+                    self.assertIn("Foghorn", j)
+                    self.assertEqual(len(j["Foghorn"]), 1)
+                    self.assertIn("nn_output", j["Foghorn"][0])
