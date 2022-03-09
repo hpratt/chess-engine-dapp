@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+
+import sys
+import subprocess
+
+def main(argc, argv):
+    return subprocess.call([ "g++-original", "-U_FORTIFY_SOURCE" ] + [ x.replace("znver3", "znver1") for x in argv[1:] ])
+
+if __name__ == "__main__":
+    sys.exit(main(len(sys.argv), sys.argv))
