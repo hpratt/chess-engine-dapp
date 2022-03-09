@@ -28,6 +28,9 @@ class TestEvaluation(unittest.TestCase):
     def resourcePath(p):
         return os.path.join(os.path.dirname(os.path.realpath(__file__)), "resources", p)
 
+    def assertSameNonNullKeys(self, a, b):
+        self.assertEqual({ k for k, v in a.items() if v is not None }, { k for k, v in b.items() if v is not None })
+
     def test_fools_mate(self):
         with open(TestEvaluation.resourcePath("fools-mate-game.json"), 'rt') as f:
             expected_output = json.load(f)
@@ -38,7 +41,7 @@ class TestEvaluation(unittest.TestCase):
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
-                self.assertEqual(j, expected_output)
+                self.assertSameNonNullKeys(j, expected_output)
 
     def test_fools_mate_from_fen(self):
         with open(TestEvaluation.resourcePath("fools-mate-game-fen.json"), 'rt') as f:
@@ -50,7 +53,7 @@ class TestEvaluation(unittest.TestCase):
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
-                self.assertEqual(j, expected_output)
+                self.assertSameNonNullKeys(j, expected_output)
 
     def test_game_of_century(self):
         with open(TestEvaluation.resourcePath("game-of-century-50-ply.json"), 'rt') as f:
@@ -62,7 +65,7 @@ class TestEvaluation(unittest.TestCase):
             self.assertEqual(os.path.exists(output), True)
             with open(output, 'rt') as f:
                 j = json.load(f)
-                self.assertEqual(j, expected_output)
+                self.assertSameNonNullKeys(j, expected_output)
     
     def test_game_of_century_timed_foghorn(self):
         with tempfile.TemporaryDirectory() as d:
