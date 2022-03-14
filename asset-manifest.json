@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/chess-engine-dapp/static/css/main.073c9b0a.css",
+    "main.js": "/chess-engine-dapp/static/js/main.0b555b5c.js",
+    "static/js/643.51140a5f.chunk.js": "/chess-engine-dapp/static/js/643.51140a5f.chunk.js",
+    "static/js/787.08639fe6.chunk.js": "/chess-engine-dapp/static/js/787.08639fe6.chunk.js",
+    "static/media/analysis.png": "/chess-engine-dapp/static/media/analysis.9cf026ab08a0a5835435.png",
+    "static/media/engine-vs-engine.png": "/chess-engine-dapp/static/media/engine-vs-engine.094bf4a79dc8fd719f96.png",
+    "index.html": "/chess-engine-dapp/index.html",
+    "main.073c9b0a.css.map": "/chess-engine-dapp/static/css/main.073c9b0a.css.map",
+    "main.0b555b5c.js.map": "/chess-engine-dapp/static/js/main.0b555b5c.js.map",
+    "643.51140a5f.chunk.js.map": "/chess-engine-dapp/static/js/643.51140a5f.chunk.js.map",
+    "787.08639fe6.chunk.js.map": "/chess-engine-dapp/static/js/787.08639fe6.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.073c9b0a.css",
+    "static/js/main.0b555b5c.js"
+  ]
+}
