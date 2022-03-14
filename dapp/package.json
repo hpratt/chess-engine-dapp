@@ -1,6 +1,7 @@
 {
   "name": "dapp",
   "version": "0.1.0",
+  "homepage": "https://hpratt.github.io/chess-engine-dapp",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.7.1",
@@ -47,7 +48,9 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-app-rewired eject"
+    "eject": "react-app-rewired eject",
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -68,6 +71,7 @@
     ]
   },
   "devDependencies": {
-    "@types/chess.js": "^0.11.2"
+    "@types/chess.js": "^0.11.2",
+    "gh-pages": "^3.2.3"
   }
 }
